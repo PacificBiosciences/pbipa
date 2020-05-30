@@ -18,6 +18,15 @@ For more info: https://github.com/PacificBiosciences/pbbioconda/wiki/Improved-Ph
 
 
 ## Installation from Bioconda
+
+First, be sure to select the right channels. Look in your `~/.condarc` and
+if necessary run this:
+```
+conda config --prepend channels defaults
+conda config --prepend channels conda-forge
+conda config --prepend channels bioconda
+```
+
 IPA is available via Bioconda:
 ```
 conda create -n ipa
