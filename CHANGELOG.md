@@ -1,5 +1,8 @@
 ### Changes
 
+* `v1.2.0`
+  * Use htslib=1.10; stop pinning in Bioconda
+  * Add "-e" to get_seqs in purge-dups
 * `v1.1.2`
   * Retain elements with high copy numbers, and down-sample them.
   * Important bug-fix in nighthawk for some genomes (including HG).
