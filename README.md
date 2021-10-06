@@ -150,3 +150,19 @@ config_seqdb_opt=--compression 1
 config_use_hpc=0
 config_use_seq_ids=1
 ```
+
+## Contig headers
+IPA (without `purge_dups`) generates contigs with headers of the form:
+- Primary contigs: `ctg.[0-9]{6}[FR]`. The number represents the contig identifier. Example: `ctg.000003F`.
+- Haplotigs: `ctg.[0-9]{6}[FR]-[0-9]{3}-[0-9]{2}` - meaning: `<contig_id>-<bubble_id>-<branch_id>`, where `bubble_id` represents the ID of a bubble in the assembly graph, and `branch_id` refers to individual branches in the bubble. Example: `ctg.000003F-003-01`.
+- Haplotigs with any other type of headers are produced by `purge_dups`. The `purge_dups` modifies headers when it moves a contig from the primary pile to the haplotig pile (e.g. `hap_` prefix in the contigs). Example: `hap_ctg.000004F`.
+
+Additionally, different stages of assembly may add other tags (whitespace separated) to the sequence headers. Concretely:
+* Stage `10-assemble`, primary contigs:
+    * `>ctg.000003F label ctg_linear 15597457 108971087` - Columns are: (1) contig identifier, (2) tag placeholder for legacy compatibility currently always marked as `label`, (3) tag which marks the contig as either linear or circular (`ctg_linear` or `ctg_circular`), (4) contig length and (5) contig score.
+
+* Stage `14-separate`, both primary contigs and haplotigs:
+    * `>ctg.000003F LN:i:15600633 RC:i:17803 XC:f:0.998846` - Columns are: (1) contig identifier, (2) length of the contig (Racon tag), (3) number of reads aligned to that contig which were available for polishing (Racon tag), (4) fraction of the contig that was polished (depending on input alignments, Racon tag).
+
+* Stage `19-final`, haplotigs:
+    * `>hap_ctg.000004F HAPLOTIG` - Columns are: (1) contig identifier, modified by `purge_dups`, (2) `purge_dups` tag which can be "HAPLOTIG", "OVLP", "REPEAT", "JUNK", etc. Please consult `purge_dups` documentation for explanation of these tags.
