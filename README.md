@@ -35,6 +35,45 @@ conda install pbipa
 ```
 IPA requires python 3.7+. Please use miniconda3, not miniconda2. We currently only support Linux 64-bit, not MacOS or Linux 32-bit.
 
+## Troubleshooting the Bioconda installation
+In some cases, `bioconda install` may pull wrong versions of packages into your environment.
+Here are some common issues.
+
+### 1. Snakemake error: "ImportError: cannot import name 'parse_uri' from 'smart_open'"
+Snakemake depends on the `smart_open` package, and there is a discrepancy between the versions of the two packages in your installation.  
+Solution is to either upgrade `snakemake` or downgrade `smart_open` in your `conda` environtment.  
+Please take a look at the following issue for more details:  
+https://github.com/PacificBiosciences/pbbioconda/issues/476
+
+### 2. Samtools error: "samtools: error while loading shared libraries: libcrypto.so.1.0.0: cannot open shared object file"
+This error has nothing to do with IPA itself.  
+It is a known long-standing Samtools error which happens with older versions of Samtools (v1.9).  
+Most likely, Samtools or OpenSSL get pulled from the wrong Conda channel.  
+The same issue was also reported in other projects with suggested solutions:  
+https://github.com/bioconda/bioconda-recipes/issues/12100
+
+
+All the reports of this issue we have seen were with respect to Samtools v1.9.  
+**The best solution is to upgrade Samtools to >=1.10.**  
+
+
+Otherwise, the solution which worked for most users is to manually create a file `~/.condarc` with the following content:  
+```
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+```
+If the order of channels is wrong, Conda may pull wrong versions of Samtools and libcrypto.  
+
+Another solution is to explicitly downgrade `openssl`:  
+```
+conda install -c bioconda samtools openssl=1.0
+```
+
+Make sure you install `pbipa` fresh after these changes (e.g. in a new environment).  
+
+
 ## Usage examples
 IPA can be run using the `ipa` executable. The runner contains two subtools:
 - `ipa local` - Running a local job on the current machine.
